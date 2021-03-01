@@ -29,17 +29,19 @@ def home():
         "Available Routes:<br><br>"
         "<strong>/api/v1.0/precipitation:</strong> The last year of precipitation measurements in the dataset<br>"
         "<strong>/api/v1.0/stations:</strong> A list of stations in the dataset<br>"
-        "<strong>/api/v1.0/tobs:</strong>The last year of temperatures recorded at station USC00519281 <br>"
-        "<strong>/api/v1.0/<start_date>:</strong> The minimum, maximum, and average temperatures between the given date and 2017-08-23<br>"
-        "<strong>/api/v1.0/<start_date>/<end_date>:</strong> The minimum, maximum, and average temperatures between the given dates.<br><br>"
+        "<strong>/api/v1.0/tobs:</strong> The last year of temperatures recorded at station USC00519281 <br>"
+        "<strong>/api/v1.0/&lt;start_date&gt;:</strong> The minimum, maximum, and average temperatures between the given date and 2017-08-23<br>"
+        "<strong>/api/v1.0/&lt;start_date&gt;/&lt;end_date&gt;:</strong> The minimum, maximum, and average temperatures between the given dates<br><br>"
         "please enter start and stop dates in the format yyyy-mm-dd, ie. 2016-03-14"
     )
+
+    #thank you https://stackoverflow.com/questions/14659240/angle-bracket-without-triggering-html-code/14659254, html is the worst
 
 @app.route("/api/v1.0/precipitation")
 def precipitation():
     session = Session(engine)
     start = dt.datetime(2016, 8, 23, 0, 0)
-    year = session.query(Measurement.date, Measurement.prcp).filter(Measurement.date > start).all()
+    year = session.query(Measurement.date, func.avg(Measurement.prcp)).group_by(Measurement.date).filter(Measurement.date > start).all()
     session.close()
 
     results={}
@@ -53,7 +55,9 @@ def precipitation():
 
     return jsonify(results)
     
-    
+    # I know it didn't say to average the precipitation, but there is more than one measurement per date!
+    # Which meant I couldn't do a dictionary with a 1:1 relationship of date:measurement.
+    # So I took the average so I'd be able to make the dictionary work.
 
 
 @app.route("/api/v1.0/stations")
