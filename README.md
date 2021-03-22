@@ -9,3 +9,8 @@ This project pulls temperature and precipitation measurements taken by several w
 * Database: SQLite
 * Exploratory analysis: Python via Jupyter Notebook
 * User input/display: Flask
+
+## To Run
+
+* Run app.py, which contains the flask app
+* Open http://127.0.0.1:5000/ in a web browser
